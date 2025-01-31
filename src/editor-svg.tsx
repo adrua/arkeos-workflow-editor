@@ -384,13 +384,6 @@ export class EditorSvg {
     return _paths.join(' ');
   }
 
-  renderTransitionDirection(transition: any) {
-
-    return (<path class="direction"  
-              style={ { "--transition-stroke": (transition.params.Switch) ? "blue" : "black"  } }
-              d={this.getTransitionDirections(transition)} />);
-  }
-
   getTransitionPath(transition: any) {
     let start = this.source.s.find((s) => s.id === transition.s.s);
     let end = this.source.s.find((s) => s.id === transition.e.s);
@@ -427,23 +420,19 @@ export class EditorSvg {
     
     return _paths.join(' ');
   }
-
-  renderTransition(transition: any) {
-
-    return (<g> 
-      <path class="transition"
-        style={ { "--transition-stroke": (transition.params.Switch) ? "blue" : "black"  } }
-        d={ this.getTransitionPath(transition) }
-        />
-      { this.renderTransitionDirection(transition) }
-    </g>);
-  }
+// #endregion
 
   renderTransitions(transitions: any[]) {
     //console.log(`transitions: ${transitions.length}` )
-    return transitions.map((t) => this.renderTransition(t)) 
+    return transitions.map((t) => (<g style={ { "--transition-stroke": (t.params.Switch) ? "blue" : "black"  } }> 
+      <path class="transition"
+        d={ this.getTransitionPath(t) }
+      />
+      <path class="direction"  
+        d={ this.getTransitionDirections(t) }  
+      />)
+    </g>)) 
   }
-// #endregion
 
   renderShapeKind(s: any) {
     switch(s.type) {
@@ -451,6 +440,16 @@ export class EditorSvg {
         return (<Fragment>
           <circle 
             fill="lightgreen"
+            r={s.r}>
+          </circle>
+          <text x={- s.r / 2} y={-5}>
+            <tspan>{s.title}</tspan>
+          </text>
+        </Fragment>);
+      case 3: 
+        return (<Fragment>
+          <circle 
+            fill="red"
             r={s.r}>
           </circle>
           <text x={- s.r / 2} y={-5}>
