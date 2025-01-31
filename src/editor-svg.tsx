@@ -354,7 +354,8 @@ export class EditorSvg {
     return y;
   }
 
-  renderTransitionDirection(transition: any, end: any) {
+  getTransitionDirections(transition: any) {
+    let end = this.source.s.find((s) => s.id === transition.e.s);
     let dir = transition.e.k;
     let x = this.getTransitionEndX(dir, end);
     let y = this.getTransitionEndY(dir, end);
@@ -380,17 +381,17 @@ export class EditorSvg {
     }
 
     _paths.push(`Z`);
-    let _path = _paths.join(' ');
+    return _paths.join(' ');
+  }
 
-    //console.log('direction ' + dir)
-    //console.log(_path)
+  renderTransitionDirection(transition: any) {
 
     return (<path class="direction"  
               style={ { "--transition-stroke": (transition.params.Switch) ? "blue" : "black"  } }
-              d={_path} />);
+              d={this.getTransitionDirections(transition)} />);
   }
 
-  renderTransition(transition: any) {
+  getTransitionPath(transition: any) {
     let start = this.source.s.find((s) => s.id === transition.s.s);
     let end = this.source.s.find((s) => s.id === transition.e.s);
     let _paths = [];
@@ -424,14 +425,17 @@ export class EditorSvg {
 
     //console.log(_paths)
     
-    let _path = _paths.join(' ');
+    return _paths.join(' ');
+  }
+
+  renderTransition(transition: any) {
 
     return (<g> 
       <path class="transition"
         style={ { "--transition-stroke": (transition.params.Switch) ? "blue" : "black"  } }
-        d={ _path }
+        d={ this.getTransitionPath(transition) }
         />
-      { this.renderTransitionDirection(transition, end) }
+      { this.renderTransitionDirection(transition) }
     </g>);
   }
 
@@ -508,8 +512,4 @@ export class EditorSvg {
       </Host>
     );
   }
-}
-
-function forceupdate(arg0: this) {
-throw new Error("Function not implemented.");
 }
