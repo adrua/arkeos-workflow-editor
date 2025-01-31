@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@stencil/core": "2.14.2"
+    "@stencil/core": "4.25.1"
   },
   "scripts": {
     "serve": "npx wcd-cli@latest serve 0t5GagI1bL8c87In3UGl --open"

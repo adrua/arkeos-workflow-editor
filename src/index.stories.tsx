@@ -9,5 +9,5 @@ export default {
   },
 };
 
-export const story1 = () => <editor-rtf></editor-rtf>;
-export const story2 = () => <editor-svg></editor-svg>;
+export const Workflow = () => <editor-svg></editor-svg>;
+export const RichTextEditor = () => <editor-rtf></editor-rtf>;

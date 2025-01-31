@@ -1,3 +1,6 @@
+$icon-x: --icon-x;
+$icon-y: --icon-y;
+
 :host {
   width: 100%;
   height: 100%;
@@ -36,4 +39,15 @@ path.direction {
   fill: var(--transition-stroke);
   stroke: var(--transition-stroke);
   stroke-width: 1;
+}
+
+g.state-connector {
+  fill: green;
+  stroke: greenyellow;  
+  stroke-width: 1;
+}
+
+g.icon {
+  width: 24px;
+  height: 24px;
 }
