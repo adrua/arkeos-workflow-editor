@@ -1,0 +1,39 @@
+:host {
+  width: 100%;
+  height: 100%;
+  --border-radius: 3px;
+  --margin: 10px;
+}
+
+svg.editor {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  border: 3px;
+  border-style: dashed;
+  border-radius: var(--border-radius);
+  //background-color: rgb(170, 187, 248);
+  color: white;
+}
+
+text {
+  dominant-baseline: hanging;
+  font: 14px Verdana, Helvetica, Arial, sans-serif;
+  fill: blueviolet;
+  font-weight: bold;
+  padding: 10px 10px; 
+}
+
+path.transition {
+  fill: none;
+  stroke: var(--transition-stroke);
+  stroke-width: 3;
+}
+
+path.direction {
+  fill: var(--transition-stroke);
+  stroke: var(--transition-stroke);
+  stroke-width: 1;
+}
