@@ -19,6 +19,9 @@ export class EditorSvg {
   @State()
   currentTransition: any;
 
+  currentTransitionStateStart: any;
+  currentTransitionStateEnd: any;
+
   source = {
   "v": "1.1",
   "s": [
@@ -401,7 +404,7 @@ export class EditorSvg {
   getTransitionPath(transition: any) {
     let start = this.states.find((s) => s.id === transition.s.s);
     let end = this.states.find((s) => s.id === transition.e.s);
-    let _paths = [`${this.getTransitionStartX(transition.s.k, start)}, ${this.getTransitionStartY(transition.s.k, start)}`];
+    let _paths = [`${this.getTransitionStartX(transition.s.k, start)},${this.getTransitionStartY(transition.s.k, start)}`];
 
     switch(true)
     {
@@ -411,33 +414,72 @@ export class EditorSvg {
       case start.position.y === end.position.y: 
         break;
       case transition.s.k === "left" && transition.e.k === "bottom":
-        _paths.push(`${this.getTransitionStartX(transition.s.k, start) - this.w4}, ${this.getTransitionStartY(transition.s.k, start)}`);
-        _paths.push(`${this.getTransitionStartX(transition.s.k, start) - this.w4}, ${this.getTransitionEndY(transition.e.k, end) + this.w4}`);
+        _paths.push(`${this.getTransitionStartX(transition.s.k, start) - this.w4},${this.getTransitionStartY(transition.s.k, start)}`);
+        _paths.push(`${this.getTransitionStartX(transition.s.k, start) - this.w4},${this.getTransitionEndY(transition.e.k, end) + this.w4}`);
         _paths.push(`${this.getTransitionEndX(transition.e.k, end)}, ${this.getTransitionEndY(transition.e.k, end) + this.w4}`);
         break;
       case transition.s.k === "bottom" && transition.e.k === "left":
-        _paths.push(`${this.getTransitionStartX(transition.s.k, start)}, ${this.getTransitionStartY(transition.s.k, start) + this.w4}`);
-        _paths.push(`${this.getTransitionStartX(transition.e.k, end) - this.w4}, ${this.getTransitionEndY(transition.s.k, start) + this.w4}`);
-        _paths.push(`${this.getTransitionEndX(transition.e.k, end) - this.w4}, ${this.getTransitionEndY(transition.e.k, end)}`);
+        _paths.push(`${this.getTransitionStartX(transition.s.k, start)},${this.getTransitionStartY(transition.s.k, start) + this.w4}`);
+        _paths.push(`${this.getTransitionStartX(transition.e.k, end) - this.w4},${this.getTransitionEndY(transition.s.k, start) + this.w4}`);
+        _paths.push(`${this.getTransitionEndX(transition.e.k, end) - this.w4},${this.getTransitionEndY(transition.e.k, end)}`);
         break;
       default: 
-        _paths.push(`${this.getTransitionStartX(transition.s.k, start)}, ${this.getTransitionStartY(transition.e.k, end)}`);
+        _paths.push(`${this.getTransitionStartX(transition.s.k, start)},${this.getTransitionStartY(transition.e.k, end)}`);
         break;      
     }
 
-    _paths.push(`${this.getTransitionEndX(transition.e.k, end)}, ${this.getTransitionEndY(transition.e.k, end)}`);
+    _paths.push(`${this.getTransitionEndX(transition.e.k, end)},${this.getTransitionEndY(transition.e.k, end)}`);
     
     return _paths.join(' ');
   }
 // #endregion
 
   renderTransitions() {
-    return this.transitions.map((t) => (<g style={ { "--transition-stroke": (t.params.Switch) ? "blue" : "black"  } }> 
-      <polyline class="transition"
-        points={ this.getTransitionPath(t) }
-        marker-end="url(#arrow)"
-      />)
-    </g>)) 
+    return this.transitions.map((t, index) => (
+      <g style={ { "--transition-stroke": (t.params.Switch) ? "blue" : "black"  } }
+        onMouseUp={(_) => {
+          this.dragging = undefined;
+          this.currentState = undefined;
+          this.currentTransition = t;
+          this.currentTransitionStateStart = this.states.find((s) => s.id == t.s.s );
+          this.currentTransitionStateEnd = this.states.find((s) => s.id == t.e.s );
+          console.log(`transition ${t.s.s} --> ${t.e.s}`)
+        }}> 
+          <polyline class="transition"
+              points={ this.getTransitionPath(t) }
+              marker-end={ (t.params.Switch) ? "url(#arrow-blue)" : "url(#arrow-black)" }
+          />
+          { (this.currentTransition === t) ? 
+            (<Fragment>                    
+                <g class="state-connector" data-connector="start" 
+                  transform={`translate(${(this.currentTransitionStateStart.type === 2) ? this.currentTransitionStateStart.w / 2 : this.currentTransitionStateStart.r / 2 - this.w3 } ${(this.currentTransitionStateStart.type === 2) ? 0 : - this.currentTransitionStateStart.r })`}>
+                  <circle r={this.w2} ></circle>
+                </g>
+                <g class="state-connector" data-connector="end"
+                  transform={`translate(${(this.currentTransitionStateEnd.type === 2) ? this.currentTransitionStateEnd.w / 2 : this.currentTransitionStateEnd.r / 2 - this.w3 } ${(this.currentTransitionStateEnd.type === 2) ? this.currentTransitionStateEnd.h : this.currentTransitionStateEnd.r })`}>
+                  <circle r={this.w2} ></circle>
+                </g>
+                { /* Delete */ }
+                <svg xmlns="http://www.w3.org/2000/svg" 
+                    x={(this.currentTransitionStateEnd.type === 2) ? this.currentTransitionStateEnd.position.x - this.w4 : this.currentTransitionStateEnd.position.x } 
+                    y={(this.currentTransitionStateEnd.type === 2) ? this.currentTransitionStateEnd.position.y - this.w2 : this.currentTransitionStateEnd.position.y}
+                    viewBox="0 -960 960 960" 
+                    width="24px" 
+                    height="24px"
+                    fill="black"
+                    opacity="0.5">
+                    <g onMouseUp={(e) => {
+                        this.transitions.splice(index, 1);
+                        this.currentTransition = undefined;
+                        this.currentTransitionStateStart = undefined;
+                        this.currentTransitionStateEnd = undefined;
+                    }}>
+                      <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/>
+                    </g>
+                </svg>      
+            </Fragment>) : null
+          }
+    </g>)); 
   }
 
   renderShapeKind(s: any) {
@@ -536,39 +578,39 @@ export class EditorSvg {
           height="24px"
           opacity="0.5">
           <g onMouseUp={ (e) => {
-              let newState = {
-                    "position": {
-                      "x": state.position.x + state.w + 100,
-                      "y": state.position.y
-                    },
-                    "id": `new-state-${this.states.length}`,
-                    "type": 2,
-                    "w": 100,
-                    "h": state.h,
-                    "a": 2,
-                    "params": { },
-                    "title": `New state #${this.states.length}`
-                  };
+              const newState = {
+                "position": {
+                  "x": state.position.x + state.w + 100,
+                  "y": state.position.y
+                },
+                "id": `new-state-${this.states.length}`,
+                "type": 2,
+                "w": 130,
+                "h": state.h,
+                "a": 2,
+                "params": { },
+                "title": `New state #${this.states.length}`
+              };
 
-              this.states = [...this.states, newState as any];
+              this.states = [newState as any, ...this.states];
 
-              let newTransition = {
-                                    "type": 0,
-                                    "s": {
-                                      "s": state.id,
-                                      "k": "right"
-                                    },
-                                    "e": {
-                                      "s": newState.id,
-                                      "k": "left"
-                                    },
-                                    "c": [
-                                      "arw-e"
-                                    ],
-                                    "params": {}
-                                  };
+              const newTransition = {
+                "type": 0,
+                "s": {
+                  "s": state.id,
+                  "k": "right"
+                },
+                "e": {
+                  "s": newState.id,
+                  "k": "left"
+                },
+                "c": [
+                  "arw-e"
+                ],
+                "params": {}
+              };
 
-              this.transitions = [...this.transitions, newTransition];
+              this.transitions = [newTransition, ...this.transitions];
           } }>
             <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/>
           </g>
@@ -604,8 +646,11 @@ export class EditorSvg {
           <marker id="circle" markerWidth="8" markerHeight="8" refX="5" refY="5">
             <circle cx="5" cy="5" r="3" fill="black" />
           </marker>
-          <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="black" />
+          <marker id="arrow-black" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+            <path d="M 0 0 L 6 3 L 0 6 z" fill="black" />
+          </marker>
+          <marker id="arrow-blue" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+            <path d="M 0 0 L 6 3 L 0 6 z" fill="blue" />
           </marker>
         </defs>
           { this.renderStates() }

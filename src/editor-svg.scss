@@ -29,13 +29,13 @@ text {
   padding: 10px 10px; 
 }
 
-path.transition {
+polyline.transition {
   fill: none;
   stroke: var(--transition-stroke);
   stroke-width: 3;
 }
 
-path.direction {
+polyline.direction {
   fill: var(--transition-stroke);
   stroke: var(--transition-stroke);
   stroke-width: 1;
