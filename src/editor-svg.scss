@@ -6,6 +6,8 @@ $icon-y: --icon-y;
   height: 100%;
   --border-radius: 3px;
   --margin: 10px;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 svg.editor {
@@ -45,6 +47,32 @@ g.state-connector {
   fill: green;
   stroke: greenyellow;  
   stroke-width: 1;
+}
+
+g.state-connector:hover {
+  fill: skyblue;
+  stroke-width: 1;
+  opacity: 50%;
+}
+
+g.transition-connector[data-connector=start] {
+  fill: lightyellow;
+  stroke: yellow;  
+  stroke-width: 1;
+  opacity: 50%;
+}
+
+g.transition-connector[data-connector=end] {
+  fill: lightgreen;
+  stroke: green;  
+  stroke-width: 1;
+  opacity: 40%;
+}
+
+g.transition-connector:hover {
+  fill: skyblue;
+  stroke-width: 1;
+  opacity: 50%;
 }
 
 g.icon {
